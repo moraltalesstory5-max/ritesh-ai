@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ritesh AI</title>
+</head>
+<body>
+  <h2>🤖 Ritesh AI</h2>
+
+  <input id="input" placeholder="Bolo ya likho..." />
+  <button onclick="send()">Send</button>
+  <button onclick="startMic()">🎤</button>
+
+  <p id="reply"></p>
+
+  <script src="script.js"></script>
+</body>
+</html>
