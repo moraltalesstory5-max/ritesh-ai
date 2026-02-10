@@ -25,4 +25,8 @@ function startMic() {
   rec.lang = "hi-IN";
   rec.onresult = e => send(e.results[0][0].transcript);
   rec.start();
+
+}
+"scripts": {
+  "start": "node server.js"
 }
