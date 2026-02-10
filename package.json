@@ -1,7 +1,6 @@
-{
+
   "name": "ritesh-ai",
   "version": "1.0.0",
-  "description": "Ritesh AI Chat Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
