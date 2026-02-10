@@ -1,15 +1,17 @@
 import express from "express";
 import fetch from "node-fetch";
-
+import path from "path";
+import { fileURLToPath } from "url";
 const app = express();
-
+const __filename = fileURLToPath(import.meta.url);
+const _dirname = path.dirname(_filename);
 // ===== middleware =====
 app.use(express.json());
 app.use(express.static("public"));
 
 // ===== health check (root) =====
 app.get("/", (req, res) => {
-  res.send("Ritesh AI is running 🚀");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // ===== CHAT API (FRONTEND MUST CALL /chat) =====
@@ -63,3 +65,4 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log("🚀 Ritesh AI live on port:", PORT);
 });
+
