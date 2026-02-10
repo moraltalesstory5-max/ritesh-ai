@@ -1,24 +1,31 @@
-const express = require("express");
+import express from "express";
+import fetch from "node-fetch";
 
 const app = express();
 
+// middleware
 app.use(express.json());
 app.use(express.static("public"));
 
-// Home page serve
+// root check
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+  res.send("Ritesh AI is running 🚀");
 });
 
-// Chat API
+// chat API (POST only)
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage = req.body && req.body.message;
+    const userMessage = req.body.message;
 
-    if (!userMessage) return res.json({ reply: "Message empty hai 😅" });
-    if (!process.env.OPENAI_API_KEY) return res.json({ reply: "OPENAI_API_KEY missing hai ❌" });
+    if (!userMessage) {
+      return res.json({ reply: "Message empty hai 😅" });
+    }
 
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+    if (!process.env.OPENAI_API_KEY) {
+      return res.json({ reply: "OPENAI_API_KEY missing hai ❌" });
+    }
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,28 +34,29 @@ app.post("/chat", async (req, res) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "You are Ritesh, a friendly Hindi + Hinglish AI assistant. Reply short, smart, human-like." },
+          {
+            role: "system",
+            content:
+              "You are Ritesh, a friendly Hindi + Hinglish AI assistant. Reply short, smart and human-like."
+          },
           { role: "user", content: userMessage }
         ]
       })
     });
 
-    const data = await r.json();
+    const data = await response.json();
 
-    if (!r.ok) {
-      console.log("OpenAI error:", data);
-      return res.status(500).json({ reply: "OpenAI error aa gaya 😕" });
-    }
-
-    const reply = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-    if (!reply) return res.json({ reply: "AI se reply nahi aaya 😕" });
-
-    res.json({ reply });
-  } catch (e) {
-    console.error("SERVER ERROR:", e);
-    res.status(500).json({ reply: "Server crash error 😭" });
+    res.json({
+      reply: data.choices[0].message.content
+    });
+  } catch (err) {
+    console.error(err);
+    res.json({ reply: "Server error aa gaya 😭" });
   }
 });
 
+// Railway port
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log("🚀 Ritesh AI live on port:", PORT));
+app.listen(PORT, () => {
+  console.log("🚀 Ritesh AI live on port:", PORT);
+});
