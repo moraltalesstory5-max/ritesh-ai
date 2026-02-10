@@ -1,41 +1,17 @@
-const chatBox = document.getElementById("chat");
-const msgInput = document.getElementById("msg");
-const sendBtn = document.getElementById("send");
-const statusEl = document.getElementById("status");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ritesh AI</title>
+</head>
+<body>
 
-function addMsg(text, who) {
-  const div = document.createElement("div");
-  div.className = "msg " + who;
-  div.textContent = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+<h2>Ritesh AI Chat 🤖</h2>
 
-async function sendMessage() {
-  const text = msgInput.value.trim();
-  if (!text) return;
+<input id="msg" placeholder="Type message..." />
+<button onclick="send()">Send</button>
 
-  addMsg(text, "me");
-  msgInput.value = "";
-  statusEl.textContent = "Thinking...";
+<p id="reply"></p>
 
-  try {
-    const r = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const d = await r.json();
-    addMsg(d.reply || "No reply 😕", "bot");
-  } catch (e) {
-    addMsg("Network/Server error 😭", "bot");
-  }
-
-  statusEl.textContent = "Ready";
-}
-
-sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
+<script src="script.js"></script>
+</body>
+</html>
