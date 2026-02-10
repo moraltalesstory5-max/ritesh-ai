@@ -1,9 +1,8 @@
 import express from "express";
 import fetch from "node-fetch";
-import dotenv from "dotenv";
 
-dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -23,8 +22,7 @@ app.post("/chat", async (req, res) => {
         messages: [
           {
             role: "system",
-            content:
-              "You are Ritesh, a fast, friendly Hindi + Hinglish AI assistant. Reply short, smart, human-like."
+            content: "You are Ritesh, a fast, friendly Hindi + Hinglish AI assistant."
           },
           { role: "user", content: userMessage }
         ]
@@ -39,7 +37,6 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Ritesh AI live on port", PORT);
+  console.log("Ritesh AI live on port " + PORT);
 });
