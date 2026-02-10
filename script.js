@@ -22,26 +22,10 @@ async function sendMessage() {
       body: JSON.stringify({ message })
     });
 
-    const contentType = res.headers.get("content-type") || "";
-
-    // अगर JSON नहीं आया तो text दिखा देंगे
-    if (!contentType.includes("application/json")) {
-      const txt = await res.text();
-      add(AI: Non-JSON response (${res.status}) -> ${txt.slice(0, 120)});
-      return;
-    }
-
     const data = await res.json();
-
-    if (!res.ok) {
-      add(AI: Error (${res.status}) -> ${data?.reply || data?.error || "Unknown error"});
-      return;
-    }
-
     add("AI: " + (data.reply || "No reply"));
   } catch (e) {
-    console.log(e);
-    add("AI: Network/Server down (fetch failed)");
+    add("AI: Server/Network error");
   }
 }
 
