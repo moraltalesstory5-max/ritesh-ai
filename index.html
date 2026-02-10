@@ -1,25 +1,17 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Ritesh AI</title>
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <h1>Ritesh AI 🤖</h1>
 
-    <div id="chat" class="chat"></div>
+<h2>Ritesh AI Chat 🤖</h2>
 
-    <div class="row">
-      <input id="msg" type="text" placeholder="Type your message..." />
-      <button id="send">Send</button>
-    </div>
+<input id="msg" placeholder="Type message..." />
+<button onclick="send()">Send</button>
 
-    <div class="hint">API: <code>/chat</code> • Status: <span id="status">Ready</span></div>
-  </div>
+<p id="reply"></p>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
