@@ -1,25 +1,19 @@
 const chat = document.getElementById("chat");
-const form = document.getElementById("chatForm");
 const input = document.getElementById("msgInput");
-const statusEl = document.getElementById("status");
+const btn = document.getElementById("sendBtn");
 
-function addMsg(text, cls) {
-  const div = document.createElement("div");
-  div.className = msg ${cls};
-  div.textContent = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+function add(text) {
+  const p = document.createElement("p");
+  p.textContent = text;
+  chat.appendChild(p);
 }
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault(); // IMPORTANT: page reload rokta hai
-
+btn.addEventListener("click", async () => {
   const message = input.value.trim();
   if (!message) return;
 
-  addMsg(message, "me");
+  add("You: " + message);
   input.value = "";
-  statusEl.textContent = "Typing...";
 
   try {
     const res = await fetch("/chat", {
@@ -29,18 +23,9 @@ form.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
-
-    if (!res.ok) {
-      addMsg(Error: ${res.status}, "ai");
-      statusEl.textContent = "";
-      return;
-    }
-
-    addMsg(data.reply || "No reply", "ai");
-    statusEl.textContent = "";
-  } catch (err) {
-    console.error(err);
-    addMsg("Network/Server error 😕", "ai");
-    statusEl.textContent = "";
+    add("AI: " + (data.reply || "No reply"));
+  } catch (e) {
+    console.log(e);
+    add("AI: Server/Network error");
   }
 });
