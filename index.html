@@ -1,17 +1,36 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>Ritesh AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ritesh AI Chat</title>
+  <style>
+    body{font-family:Arial, sans-serif; max-width:720px; margin:40px auto; padding:0 12px;}
+    h1{margin-bottom:16px;}
+    #chat{border:1px solid #ddd; padding:12px; border-radius:8px; min-height:220px; margin-bottom:12px;}
+    .msg{margin:8px 0; padding:8px 10px; border-radius:8px; background:#f6f6f6;}
+    .me{background:#e8f3ff;}
+    .ai{background:#f3ffe8;}
+    .row{display:flex; gap:8px;}
+    input{flex:1; padding:10px; border:1px solid #ccc; border-radius:8px;}
+    button{padding:10px 14px; border:0; border-radius:8px; cursor:pointer;}
+    small{color:#777;}
+  </style>
 </head>
 <body>
+  <h1>Ritesh AI Chat 🤖</h1>
 
-<h2>Ritesh AI Chat 🤖</h2>
+  <div id="chat">
+    <div class="msg ai">Ritesh boss, bol kya puchna hai 😄</div>
+  </div>
 
-<input id="msg" placeholder="Type message..." />
-<button onclick="send()">Send</button>
+  <form id="chatForm" class="row">
+    <input id="msgInput" placeholder="Type message..." autocomplete="off" />
+    <button id="sendBtn" type="submit">Send</button>
+  </form>
 
-<p id="reply"></p>
+  <small id="status"></small>
 
-<script src="script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
