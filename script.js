@@ -1,42 +1,48 @@
-const chat = document.getElementById("chat");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
+const chatBox = document.getElementById("chat");
+const input = document.getElementById("msgInput");
+const btn = document.getElementById("sendBtn");
 
-sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
+function addLine(cls, text) {
+  const div = document.createElement("div");
+  div.className = cls;
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-async function sendMessage() {
-  const message = msgInput.value.trim();
-  if (!message) return;
+async function sendMsg() {
+  const msg = input.value.trim();
+  if (!msg) return;
 
-  chat.innerHTML += <div class="me"><b>You:</b> ${escapeHtml(message)}</div>;
-  msgInput.value = "";
-  chat.scrollTop = chat.scrollHeight;
+  addLine("me", "You: " + msg);
+  input.value = "";
+  btn.disabled = true;
+  btn.textContent = "Sending...";
 
   try {
-    const response = await fetch("/chat", {
+    const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message: msg })
     });
 
-    const data = await response.json();
-    chat.innerHTML += <div class="ai"><b>AI:</b> ${escapeHtml(data.reply || "No reply")}</div>;
-    chat.scrollTop = chat.scrollHeight;
-  } catch (err) {
-    console.error(err);
-    chat.innerHTML += <div class="ai"><b>AI:</b> Network error</div>;
-    chat.scrollTop = chat.scrollHeight;
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      addLine("err", "AI: " + (data?.reply || ("Server error " + res.status)));
+    } else {
+      addLine("ai", "AI: " + (data?.reply || "No reply"));
+    }
+  } catch (e) {
+    // YE real network error hai (jab request server tak pahunchi hi nahi)
+    addLine("err", "AI: Network/Server error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send";
   }
 }
 
-function escapeHtml(str) {
-  return str
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+btn.addEventListener("click", sendMsg);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMsg();
+});
