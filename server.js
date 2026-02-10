@@ -1,5 +1,5 @@
-import express from "express";
-import fetch from "node-fetch";
+const express = require("express");
+const fetch = require("node-fetch");
 
 const app = express();
 
@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-// root check
+// root route
 app.get("/", (req, res) => {
   res.send("Ritesh AI is running 🚀");
 });
@@ -46,17 +46,14 @@ app.post("/chat", async (req, res) => {
 
     const data = await response.json();
 
+    if (!data.choices) {
+      console.log(data);
+      return res.json({ reply: "AI se reply nahi aaya 😕" });
+    }
+
     res.json({
       reply: data.choices[0].message.content
     });
   } catch (err) {
     console.error(err);
-    res.json({ reply: "Server error aa gaya 😭" });
-  }
-});
-
-// Railway port
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log("🚀 Ritesh AI live on port:", PORT);
-});
+    res.json({ reply
