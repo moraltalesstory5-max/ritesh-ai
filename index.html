@@ -1,19 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ritesh AI Chat</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ritesh AI Chat</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 16px; }
+      #chat { border: 1px solid #ccc; padding: 12px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+      #msgInput { width: 70%; padding: 8px; }
+      #sendBtn { padding: 8px 12px; }
+      .me { margin: 6px 0; }
+      .ai { margin: 6px 0; color: #0b5; }
+    </style>
+  </head>
 
-  <h1>Ritesh AI Chat 🤖</h1>
+  <body>
+    <h1>Ritesh AI Chat 🤖</h1>
 
-  <div id="chatBox"></div>
+    <div id="chat"></div>
 
-  <input id="userInput" placeholder="Type message..." />
-  <button id="sendBtn">Send</button>
+    <input id="msgInput" placeholder="Type message..." />
+    <button type="button" id="sendBtn">Send</button>
 
-  <script src="./script.js"></script>
-</body>
+    <script src="./script.js"></script>
+  </body>
 </html>
