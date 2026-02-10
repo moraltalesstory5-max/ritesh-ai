@@ -1,68 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Ritesh AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #0f172a;
-      color: #fff;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .chat-box {
-      width: 400px;
+      width: 100%;
+      max-width: 420px;
       background: #020617;
-      padding: 20px;
       border-radius: 10px;
+      padding: 15px;
     }
-    input, button {
+    .messages {
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .msg {
+      margin: 6px 0;
+    }
+    .user { color: #38bdf8; }
+    .ai { color: #22c55e; }
+    input {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
+      border-radius: 6px;
       border: none;
-    }
-    button {
-      background: #6366f1;
-      color: white;
-      cursor: pointer;
-    }
-    .reply {
-      margin-top: 15px;
-      background: #1e293b;
-      padding: 10px;
-      border-radius: 5px;
+      outline: none;
     }
   </style>
 </head>
 <body>
-
   <div class="chat-box">
-    <h2>🤖 Ritesh AI</h2>
-    <input id="msg" placeholder="Apna message likho..." />
-    <button onclick="send()">Send</button>
-    <div class="reply" id="reply"></div>
+    <h3>🤖 Ritesh AI</h3>
+    <div class="messages" id="messages"></div>
+    <input id="input" placeholder="Type your message..." />
   </div>
 
   <script>
-    async function send() {
-      const message = document.getElementById("msg").value;
-      document.getElementById("reply").innerText = "Soch raha hoon...";
+    const input = document.getElementById("input");
+    const messages = document.getElementById("messages");
 
-      const res = await fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-      });
+    input.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter" && input.value.trim()) {
+        const text = input.value;
+        messages.innerHTML += <div class="msg user">You: ${text}</div>;
+        input.value = "";
 
-      const data = await res.json();
-      document.getElementById("reply").innerText = data.reply;
-    }
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+        messages.innerHTML += <div class="msg ai">Ritesh AI: ${data.reply}</div>;
+        messages.scrollTop = messages.scrollHeight;
+      }
+    });
   </script>
-
 </body>
 </html>
