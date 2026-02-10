@@ -9,19 +9,18 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// __dirname fix for ES module
 const __filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
 
-// 👉 PUBLIC FOLDER SERVE KARO
+// ✅ public folder serve
 app.use(express.static(path.join(__dirname, "public")));
 
-// 👉 HOME ROUTE (index.html)
+// ✅ home route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 👉 CHAT API
+// ✅ AI chat API
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -35,7 +34,7 @@ app.post("/chat", async (req, res) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "You are Ritesh, a friendly Hinglish AI assistant." },
+          { role: "system", content: "You are Ritesh, a friendly Hinglish AI." },
           { role: "user", content: userMessage }
         ]
       })
@@ -45,11 +44,11 @@ app.post("/chat", async (req, res) => {
     res.json({ reply: data.choices[0].message.content });
 
   } catch (err) {
-    res.json({ reply: "Ritesh boss, kuch error aa gaya 😅" });
+    res.json({ reply: "Error aa gaya boss 😢" });
   }
 });
 
-// 👉 PORT (Railway)
+// ✅ Railway port
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log("Ritesh AI live on port", PORT);
