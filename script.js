@@ -1,41 +1,30 @@
 const chatBox = document.getElementById("chatBox");
-const input = document.getElementById("userInput");
+const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 
-function addLine(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  chatBox.appendChild(div);
-}
+sendBtn.addEventListener("click", sendMessage);
 
-sendBtn.onclick = async () => {
-  const msg = input.value.trim();
-  if (!msg) return;
+async function sendMessage() {
+  const message = userInput.value.trim();
+  if (!message) return;
 
-  addLine("You: " + msg);
-  input.value = "";
+  chatBox.innerHTML += <p><b>You:</b> ${message}</p>;
+  userInput.value = "";
 
   try {
-    const res = await fetch("/chat", {
-      method: "POST",                 // 🔴 MUST be POST
+    const response = await fetch("/chat", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        message: msg                  // 🔴 MUST be message
-      })
+      body: JSON.stringify({ message })
     });
 
-    const data = await res.json();
+    const data = await response.json();
 
-    if (data.reply) {
-      addLine("AI: " + data.reply);
-    } else {
-      addLine("AI: reply empty aaya 😕");
-    }
-
+    chatBox.innerHTML += <p><b>AI:</b> ${data.reply}</p>;
   } catch (err) {
-    addLine("AI: Network error");
     console.error(err);
+    chatBox.innerHTML += <p><b>AI:</b> Network error</p>;
   }
-};
+}
