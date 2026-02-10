@@ -1,17 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Ritesh AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-box {
+      width: 400px;
+      background: #020617;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+    .reply {
+      margin-top: 15px;
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h2>🤖 Ritesh AI</h2>
 
-  <input id="input" placeholder="Bolo ya likho..." />
-  <button onclick="send()">Send</button>
-  <button onclick="startMic()">🎤</button>
+  <div class="chat-box">
+    <h2>🤖 Ritesh AI</h2>
+    <input id="msg" placeholder="Apna message likho..." />
+    <button onclick="send()">Send</button>
+    <div class="reply" id="reply"></div>
+  </div>
 
-  <p id="reply"></p>
+  <script>
+    async function send() {
+      const message = document.getElementById("msg").value;
+      document.getElementById("reply").innerText = "Soch raha hoon...";
 
-  <script src="script.js"></script>
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      document.getElementById("reply").innerText = data.reply;
+    }
+  </script>
+
 </body>
 </html>
