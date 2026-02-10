@@ -40,5 +40,5 @@ app.post("/chat", async (req, res) => {
 app.listen(PORT, () => {
   console.log("Ritesh AI live on port " + PORT);
 });
-import dotenv from "dotenv";
-dotenv.config();
+
+
