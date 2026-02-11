@@ -1,16 +1,13 @@
 {
   "name": "ritesh-ai",
   "version": "1.0.0",
+  "type": "module",
   "main": "server.js",
-  "type": "commonjs",
-  "engines": {
-    "node": "18.x"
-  },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "node-fetch": "^2.6.12"
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
   }
 }
