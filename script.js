@@ -1,25 +1,23 @@
-const chatDiv = document.getElementById("chat");
-const input = document.getElementById("msgInput");
-const btn = document.getElementById("sendBtn");
+async function send() {
+  const input = document.getElementById("msg");
+  const chat = document.getElementById("chat");
+  const message = input.value;
 
-btn.onclick = async () => {
-  const msg = input.value.trim();
-  if (!msg) return;
+  if (!message) return;
 
-  chatDiv.innerHTML += <p><b>You:</b> ${msg}</p>;
+  chat.innerHTML += <p><b>You:</b> ${message}</p>;
   input.value = "";
 
   try {
     const res = await fetch("/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: msg })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
     });
 
     const data = await res.json();
-    chatDiv.innerHTML += <p><b>AI:</b> ${data.reply}</p>;
-  } catch (e) {
-    chatDiv.innerHTML += <p><b>AI:</b> Network error</p>;
+    chat.innerHTML += <p><b>AI:</b> ${data.reply}</p>;
+  } catch (err) {
+    chat.innerHTML += <p><b>AI:</b> Network error</p>;
   }
+}
