@@ -2,25 +2,46 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-
 app.use(express.json());
 
-// ✅ Public folder absolute path
-app.use(express.static(path.join(__dirname, "public")));
+// ✅ Try these possible locations (public OR root)
+const CANDIDATE_DIRS = [
+  path.join(__dirname, "public"),
+  __dirname, // root
+];
 
-// ✅ Force "/" to load index.html (agar static miss ho jaye to bhi)
+// ✅ find index.html
+function findFile(filename) {
+  for (const dir of CANDIDATE_DIRS) {
+    const p = path.join(dir, filename);
+    try {
+      // require fs only here to avoid extra clutter
+      require("fs").accessSync(p);
+      return p;
+    } catch (_) {}
+  }
+  return null;
+}
+
+// ✅ serve static from public if exists
+const publicDir = path.join(__dirname, "public");
+app.use(express.static(publicDir));
+
+// ✅ Home route => serve index.html wherever it is
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  const indexPath = findFile("index.html");
+  if (!indexPath) return res.status(404).send("index.html not found");
+  return res.sendFile(indexPath);
 });
 
-// ✅ Health
+// ✅ optional health
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 // ✅ Chat API
 app.post("/chat", async (req, res) => {
   try {
-    const msg = req.body?.message;
-    if (!msg) return res.json({ reply: "Message empty hai 😅" });
+    const userMessage = req.body?.message;
+    if (!userMessage) return res.json({ reply: "Message empty hai 😅" });
 
     if (!process.env.OPENAI_API_KEY) {
       return res.json({ reply: "OPENAI_API_KEY missing hai ❌" });
@@ -30,22 +51,23 @@ app.post("/chat", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + process.env.OPENAI_API_KEY,
+        Authorization: Bearer ${process.env.OPENAI_API_KEY},
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        input: msg,
+        input: userMessage,
       }),
     });
 
     const data = await response.json();
     const reply = data.output_text || "AI se reply nahi aaya 😕";
-    res.json({ reply });
-  } catch (e) {
-    console.error(e);
-    res.json({ reply: "Server error 😭" });
+    return res.json({ reply });
+  } catch (err) {
+    console.error(err);
+    return res.json({ reply: "Server/Network error 😭" });
   }
 });
 
+// ✅ Railway PORT
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log("Running on", PORT));
+app.listen(PORT, () => console.log("Running on port", PORT));
