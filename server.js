@@ -1,29 +1,26 @@
 const express = require("express");
+const path = require("path");
 
 const app = express();
 
-// Middleware
 app.use(express.json());
 
-// ✅ PUBLIC FOLDER (UI)
-app.use(express.static("public"));
+// ✅ Public folder absolute path
+app.use(express.static(path.join(__dirname, "public")));
 
-// ❌ "/" route MAT likho
-// UI index.html automatic serve hoga
-
-// ✅ HEALTH CHECK (Railway ke liye)
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+// ✅ Force "/" to load index.html (agar static miss ho jaye to bhi)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ✅ CHAT API
+// ✅ Health
+app.get("/health", (req, res) => res.json({ ok: true }));
+
+// ✅ Chat API
 app.post("/chat", async (req, res) => {
   try {
     const msg = req.body?.message;
-
-    if (!msg) {
-      return res.json({ reply: "Message empty hai 😅" });
-    }
+    if (!msg) return res.json({ reply: "Message empty hai 😅" });
 
     if (!process.env.OPENAI_API_KEY) {
       return res.json({ reply: "OPENAI_API_KEY missing hai ❌" });
@@ -33,29 +30,22 @@ app.post("/chat", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + process.env.OPENAI_API_KEY
+        Authorization: "Bearer " + process.env.OPENAI_API_KEY,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        input: msg
-      })
+        input: msg,
+      }),
     });
 
     const data = await response.json();
-
-    let reply =
-      data.output_text ||
-      "AI se reply nahi aaya 😕";
-
+    const reply = data.output_text || "AI se reply nahi aaya 😕";
     res.json({ reply });
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    console.error(e);
     res.json({ reply: "Server error 😭" });
   }
 });
 
-// ✅ PORT (MOST IMPORTANT)
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log("Running on", PORT));
