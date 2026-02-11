@@ -1,81 +1,92 @@
 const express = require("express");
-const path = require("path");
 
 const app = express();
 
-// ===== middleware =====
+// Middleware
 app.use(express.json());
 
-// public folder serve
-app.use(express.static(path.join(__dirname, "public")));
+// ✅ Public folder serve karega (index.html, script.js, etc.)
+app.use(express.static("public"));
 
-// ✅ UI page (root)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// ✅ health check
+// ✅ Railway health check alag route pe
 app.get("/health", (req, res) => {
-  res.send("Ritesh AI is running 🚀");
+  res.json({ ok: true, message: "Ritesh AI is healthy 🚀" });
 });
 
-// ===== CHAT API =====
+// ✅ Chat API
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage = req.body?.message;
+    const userMessage = (req.body && req.body.message ? String(req.body.message) : "").trim();
 
-    if (!userMessage || !userMessage.trim()) {
-      return res.status(400).json({ reply: "Message empty hai 😅" });
+    if (!userMessage) {
+      return res.json({ reply: "Message empty hai 😅" });
     }
 
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ reply: "OPENAI_API_KEY missing hai ❌" });
+      return res.json({ reply: "OPENAI_API_KEY set nahi hai (Railway Variables me add karo) ❌" });
     }
 
-    // Node 18+ me fetch built-in hota hai
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // ✅ Node 18+ me fetch built-in hota hai
+    const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: Bearer ${process.env.OPENAI_API_KEY},
+        // ❌ Yaha ${} wali bakchodi mat karo. Simple concat best.
+        "Authorization": "Bearer " + process.env.OPENAI_API_KEY
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        messages: [
+        input: [
           {
             role: "system",
-            content:
-              "You are Ritesh, a friendly Hindi + Hinglish AI assistant. Reply short, smart and human-like.",
+            content: "You are Ritesh, a fast, friendly Hindi + Hinglish AI assistant. Reply short, smart and human-like."
           },
-          { role: "user", content: userMessage },
-        ],
-      }),
+          { role: "user", content: userMessage }
+        ]
+      })
     });
 
     const data = await response.json();
 
+    // ✅ Error handling
     if (!response.ok) {
-      console.log("OpenAI error:", data);
-      return res
-        .status(500)
-        .json({ reply: "OpenAI API error aa gaya 😕" });
+      console.log("OPENAI_ERROR:", data);
+      return res.json({ reply: "OpenAI error: " + (data.error?.message || "unknown") });
     }
 
-    const reply = data?.choices?.[0]?.message?.content;
-    if (!reply) {
-      console.log("OpenAI response:", data);
-      return res.status(500).json({ reply: "AI se valid reply nahi aaya 😕" });
+    // ✅ Responses API se text nikalna
+    let replyText = "";
+
+    // Many SDKs use output_text helper; raw JSON me output array hota hai
+    if (typeof data.output_text === "string" && data.output_text.trim()) {
+      replyText = data.output_text.trim();
+    } else if (Array.isArray(data.output)) {
+      for (const item of data.output) {
+        if (item.type === "message" && Array.isArray(item.content)) {
+          for (const c of item.content) {
+            if (c.type === "output_text" && c.text) {
+              replyText += c.text;
+            }
+          }
+        }
+      }
+      replyText = replyText.trim();
     }
 
-    res.json({ reply });
+    if (!replyText) {
+      console.log("NO_TEXT_RESPONSE:", data);
+      replyText = "API se reply text nahi mila 😕";
+    }
+
+    res.json({ reply: replyText });
   } catch (err) {
-    console.error("SERVER ERROR:", err);
-    res.status(500).json({ reply: "Server error aa gaya 😭" });
+    console.error("SERVER_CRASH:", err);
+    res.json({ reply: "Ritesh boss, server crash ho gaya 😭" });
   }
 });
 
-// ===== Railway PORT =====
+// ✅ Railway PORT
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log("🚀 Ritesh AI live on port:", PORT);
+  console.log("Ritesh AI live on port:", PORT);
 });
