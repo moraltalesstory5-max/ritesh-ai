@@ -1,34 +1,17 @@
-const chat = document.getElementById("chat");
-const chatForm = document.getElementById("chatForm");
-const msgInput = document.getElementById("msgInput");
+async function send() {
+  const input = document.getElementById("msg");
+  const chat = document.getElementById("chat");
 
-function addMsg(who, text) {
-  const div = document.createElement("div");
-  div.className = "msg";
-  div.innerHTML = <span class="${who === "You" ? "you" : "ai"}">${who}:</span> ${text};
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+  const text = input.value;
+  chat.innerHTML += <p>You: ${text}</p>;
+  input.value = "";
+
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  });
+
+  const data = await res.json();
+  chat.innerHTML += <p>AI: ${data.reply}</p>;
 }
-
-chatForm.addEventListener("submit", async (e) => {
-  e.preventDefault(); // ✅ refresh रोकता है
-
-  const message = msgInput.value.trim();
-  if (!message) return;
-
-  addMsg("You", message);
-  msgInput.value = "";
-
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await res.json();
-    addMsg("AI", data.reply || "No reply 😕");
-  } catch (err) {
-    addMsg("AI", "Server/Network error");
-  }
-});
