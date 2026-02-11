@@ -1,21 +1,23 @@
 const chat = document.getElementById("chat");
-const input = document.getElementById("msgInput");
-const btn = document.getElementById("sendBtn");
+const chatForm = document.getElementById("chatForm");
+const msgInput = document.getElementById("msgInput");
 
-function addLine(label, text) {
+function addMsg(who, text) {
   const div = document.createElement("div");
   div.className = "msg";
-  div.innerHTML = <span class="${label === "You" ? "you" : "ai"}">${label}:</span> ${text};
+  div.innerHTML = <span class="${who === "You" ? "you" : "ai"}">${who}:</span> ${text};
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-async function sendMessage() {
-  const message = input.value.trim();
+chatForm.addEventListener("submit", async (e) => {
+  e.preventDefault(); // ✅ refresh रोकता है
+
+  const message = msgInput.value.trim();
   if (!message) return;
 
-  addLine("You", message);
-  input.value = "";
+  addMsg("You", message);
+  msgInput.value = "";
 
   try {
     const res = await fetch("/chat", {
@@ -25,13 +27,8 @@ async function sendMessage() {
     });
 
     const data = await res.json();
-    addLine("AI", data.reply || "No reply");
-  } catch (e) {
-    addLine("AI", "Server/Network error");
+    addMsg("AI", data.reply || "No reply 😕");
+  } catch (err) {
+    addMsg("AI", "Server/Network error");
   }
-}
-
-btn.addEventListener("click", sendMessage);
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
 });
