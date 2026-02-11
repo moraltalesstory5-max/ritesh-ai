@@ -1,37 +1,25 @@
-const chat = document.getElementById("chat");
+const chatDiv = document.getElementById("chat");
 const input = document.getElementById("msgInput");
 const btn = document.getElementById("sendBtn");
 
-function addLine(cls, text) {
-  const div = document.createElement("div");
-  div.className = cls;
-  div.textContent = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
+btn.onclick = async () => {
+  const msg = input.value.trim();
+  if (!msg) return;
 
-async function sendMsg() {
-  const message = input.value.trim();
-  if (!message) return;
-
-  addLine("me", "You: " + message);
+  chatDiv.innerHTML += <p><b>You:</b> ${msg}</p>;
   input.value = "";
 
   try {
     const res = await fetch("/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: msg })
     });
 
     const data = await res.json();
-    addLine("ai", "AI: " + (data.reply || "No reply"));
+    chatDiv.innerHTML += <p><b>AI:</b> ${data.reply}</p>;
   } catch (e) {
-    addLine("ai", "AI: Network error");
+    chatDiv.innerHTML += <p><b>AI:</b> Network error</p>;
   }
-}
-
-btn.addEventListener("click", sendMsg);
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMsg();
-});
