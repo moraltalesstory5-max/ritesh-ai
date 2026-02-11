@@ -1,11 +1,20 @@
-async function send() {
-  const input = document.getElementById("msg");
-  const chat = document.getElementById("chat");
-  const message = input.value;
+const chat = document.getElementById("chat");
+const input = document.getElementById("msgInput");
+const btn = document.getElementById("sendBtn");
 
+function addLine(label, text) {
+  const div = document.createElement("div");
+  div.className = "msg";
+  div.innerHTML = <span class="${label === "You" ? "you" : "ai"}">${label}:</span> ${text};
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMessage() {
+  const message = input.value.trim();
   if (!message) return;
 
-  chat.innerHTML += <p><b>You:</b> ${message}</p>;
+  addLine("You", message);
   input.value = "";
 
   try {
@@ -16,8 +25,13 @@ async function send() {
     });
 
     const data = await res.json();
-    chat.innerHTML += <p><b>AI:</b> ${data.reply}</p>;
-  } catch (err) {
-    chat.innerHTML += <p><b>AI:</b> Network error</p>;
+    addLine("AI", data.reply || "No reply");
+  } catch (e) {
+    addLine("AI", "Server/Network error");
   }
 }
+
+btn.addEventListener("click", sendMessage);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
