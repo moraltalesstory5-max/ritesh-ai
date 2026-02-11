@@ -1,31 +1,43 @@
-import express from "express";
-import fetch from "node-fetch";
+const express = require("express");
+const path = require("path");
 
 const app = express();
 
-// middleware
+// ===== middleware =====
 app.use(express.json());
-app.use(express.static("public"));
 
-// health check (important for Railway)
+// public folder serve
+app.use(express.static(path.join(__dirname, "public")));
+
+// ✅ UI page (root)
 app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ✅ health check
+app.get("/health", (req, res) => {
   res.send("Ritesh AI is running 🚀");
 });
 
-// chat API
+// ===== CHAT API =====
 app.post("/chat", async (req, res) => {
   try {
-    const userMessage = req.body.message;
+    const userMessage = req.body?.message;
 
-    if (!userMessage) {
-      return res.json({ reply: "Message empty hai 😅" });
+    if (!userMessage || !userMessage.trim()) {
+      return res.status(400).json({ reply: "Message empty hai 😅" });
     }
 
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ reply: "OPENAI_API_KEY missing hai ❌" });
+    }
+
+    // Node 18+ me fetch built-in hota hai
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + process.env.OPENAI_API_KEY
+        Authorization: Bearer ${process.env.OPENAI_API_KEY},
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
@@ -33,36 +45,37 @@ app.post("/chat", async (req, res) => {
           {
             role: "system",
             content:
-              "You are Ritesh, a fast, friendly Hindi + Hinglish AI assistant. Reply short, smart and human-like."
+              "You are Ritesh, a friendly Hindi + Hinglish AI assistant. Reply short, smart and human-like.",
           },
-          {
-            role: "user",
-            content: userMessage
-          }
-        ]
-      })
+          { role: "user", content: userMessage },
+        ],
+      }),
     });
 
     const data = await response.json();
 
-    if (!data.choices) {
-      console.log(data);
-      return res.json({ reply: "API se response nahi aaya 😕" });
+    if (!response.ok) {
+      console.log("OpenAI error:", data);
+      return res
+        .status(500)
+        .json({ reply: "OpenAI API error aa gaya 😕" });
     }
 
-    res.json({
-      reply: data.choices[0].message.content
-    });
-  } catch (error) {
-    console.error(error);
-    res.json({
-      reply: "Ritesh boss, server crash ho gaya 😭"
-    });
+    const reply = data?.choices?.[0]?.message?.content;
+    if (!reply) {
+      console.log("OpenAI response:", data);
+      return res.status(500).json({ reply: "AI se valid reply nahi aaya 😕" });
+    }
+
+    res.json({ reply });
+  } catch (err) {
+    console.error("SERVER ERROR:", err);
+    res.status(500).json({ reply: "Server error aa gaya 😭" });
   }
 });
 
-// Railway PORT
+// ===== Railway PORT =====
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log("Ritesh AI live on port:", PORT);
+  console.log("🚀 Ritesh AI live on port:", PORT);
 });
