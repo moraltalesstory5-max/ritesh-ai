@@ -1,18 +1,30 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ritesh AI Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 720px; margin: 30px auto; padding: 0 12px; }
+    #chat { border: 1px solid #ddd; padding: 12px; height: 360px; overflow-y: auto; border-radius: 8px; }
+    .msg { margin: 8px 0; }
+    .you { font-weight: 700; }
+    .ai { font-weight: 700; }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+    button { padding: 10px 14px; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; cursor: pointer; }
+  </style>
 </head>
 <body>
+  <h1>Ritesh AI Chat 🤖</h1>
 
-<h2>Ritesh AI Chat 🤖</h2>
+  <div id="chat"></div>
 
-<div id="chat"></div>
+  <div class="row">
+    <input id="msgInput" placeholder="Type message..." />
+    <button id="sendBtn" type="button">Send</button>
+  </div>
 
-<input id="msg" placeholder="Type message..." />
-<button onclick="send()">Send</button>
-
-<script src="script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
