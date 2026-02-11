@@ -6,19 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.send("Ritesh AI is running 🚀");
-});
-
 app.post("/chat", async (req, res) => {
   try {
     const message = req.body.message;
 
-    if (!message) {
-      return res.status(400).json({ reply: "Empty message" });
-    }
-
-    const openaiRes = await fetch(
+    const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
@@ -36,11 +28,8 @@ app.post("/chat", async (req, res) => {
       }
     );
 
-    const data = await openaiRes.json();
-
-    res.json({
-      reply: data.choices[0].message.content
-    });
+    const data = await response.json();
+    res.json({ reply: data.choices[0].message.content });
 
   } catch (err) {
     console.error(err);
