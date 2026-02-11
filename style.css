@@ -1,12 +1,5 @@
-body { font-family: Arial, sans-serif; background:#0b1020; color:#fff; margin:0; }
-.app { max-width:700px; margin:20px auto; padding:16px; }
-h1 { margin:0 0 12px; }
-.chat { background:#121a33; border:1px solid #25315a; height:65vh; overflow:auto; padding:12px; border-radius:10px; }
-.msg { padding:10px 12px; margin:8px 0; border-radius:10px; max-width:85%; white-space:pre-wrap; }
-.me { background:#2a4bff; margin-left:auto; }
-.bot { background:#1f2a4b; }
-.row { display:flex; gap:8px; margin-top:10px; }
-input { flex:1; padding:12px; border-radius:10px; border:1px solid #25315a; background:#0f1730; color:#fff; outline:none; }
-button { padding:12px 16px; border-radius:10px; border:0; background:#7c3aed; color:#fff; cursor:pointer; }
-.hint { margin-top:10px; opacity:.8; font-size:14px; }
-code { background:#0f1730; padding:2px 6px; border-radius:6px; }
+body { font-family: Arial, sans-serif; padding: 20px; }
+#chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+.row { display: flex; gap: 10px; }
+#msgInput { flex: 1; padding: 10px; }
+#sendBtn { padding: 10px 16px; cursor: pointer; }
