@@ -1,73 +1,75 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+const fetch = require("node-fetch"); // ✅ works on all Node versions
 
 const app = express();
 app.use(express.json());
 
-// ✅ Try these possible locations (public OR root)
-const CANDIDATE_DIRS = [
-  path.join(__dirname, "public"),
-  __dirname, // root
-];
+// ✅ static serve (public folder exists ho to)
+app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ find index.html
-function findFile(filename) {
-  for (const dir of CANDIDATE_DIRS) {
-    const p = path.join(dir, filename);
-    try {
-      // require fs only here to avoid extra clutter
-      require("fs").accessSync(p);
-      return p;
-    } catch (_) {}
+// ✅ find index.html (public OR root)
+function findIndex() {
+  const candidates = [
+    path.join(__dirname, "public", "index.html"),
+    path.join(__dirname, "index.html")
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
   }
   return null;
 }
 
-// ✅ serve static from public if exists
-const publicDir = path.join(__dirname, "public");
-app.use(express.static(publicDir));
-
-// ✅ Home route => serve index.html wherever it is
+// ✅ Home page (UI)
 app.get("/", (req, res) => {
-  const indexPath = findFile("index.html");
+  const indexPath = findIndex();
   if (!indexPath) return res.status(404).send("index.html not found");
   return res.sendFile(indexPath);
 });
-
-// ✅ optional health
-app.get("/health", (req, res) => res.json({ ok: true }));
 
 // ✅ Chat API
 app.post("/chat", async (req, res) => {
   try {
     const userMessage = req.body?.message;
+
     if (!userMessage) return res.json({ reply: "Message empty hai 😅" });
 
     if (!process.env.OPENAI_API_KEY) {
       return res.json({ reply: "OPENAI_API_KEY missing hai ❌" });
     }
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: Bearer ${process.env.OPENAI_API_KEY},
+        "Authorization": Bearer ${process.env.OPENAI_API_KEY}
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        input: userMessage,
-      }),
+        messages: [
+          { role: "system", content: "You are a fast, friendly Hindi + Hinglish AI assistant." },
+          { role: "user", content: userMessage }
+        ]
+      })
     });
 
     const data = await response.json();
-    const reply = data.output_text || "AI se reply nahi aaya 😕";
+
+    const reply =
+      data?.choices?.[0]?.message?.content ||
+      data?.error?.message ||
+      "AI se reply nahi aaya 😕";
+
     return res.json({ reply });
   } catch (err) {
-    console.error(err);
+    console.error("CHAT ERROR:", err);
     return res.json({ reply: "Server/Network error 😭" });
   }
 });
 
-// ✅ Railway PORT
+// ✅ Railway needs PORT
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log("Running on port", PORT));
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Ritesh AI live on port:", PORT);
+});
