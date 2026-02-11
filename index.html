@@ -1,33 +1,16 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ritesh AI Chat</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #chat { border: 1px solid #ddd; padding: 12px; height: 320px; overflow-y: auto; margin-bottom: 12px; }
-    .msg { margin: 8px 0; }
-    .you { font-weight: bold; }
-    .ai { font-weight: bold; }
-    form { display: flex; gap: 10px; }
-    input { flex: 1; padding: 10px; }
-    button { padding: 10px 16px; cursor: pointer; }
-  </style>
 </head>
 <body>
   <h1>Ritesh AI Chat 🤖</h1>
 
-  <div id="chat">
-    <div class="msg"><span class="ai">AI:</span> Ritesh boss, bol kya puchna hai 😄</div>
-  </div>
+  <div id="chat"></div>
 
-  <!-- ✅ form used ताकि enter pe submit हो, BUT refresh नहीं होगा (script रोक देगा) -->
-  <form id="chatForm">
-    <input id="msgInput" placeholder="Type message..." autocomplete="off" />
-    <button type="submit" id="sendBtn">Send</button>
-  </form>
+  <input id="msg" placeholder="Type message..." />
+  <button onclick="send()">Send</button>
 
-  <script src="./script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
